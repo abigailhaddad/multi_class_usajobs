@@ -13,13 +13,10 @@ Created on Sun Apr  9 18:22:00 2023
 """
 
 import pickle
-from typing import Any, List, Tuple
-
-import numpy as np
+from typing import Any, List
 import openai
 import pandas as pd
 import json
-
 from pydantic import BaseModel
 
 
@@ -45,67 +42,7 @@ def gen_list_of_occupations() -> List[str]:
     list_of_raw_occupations = [
         "1529",  # Mathematician
         "1550",  # Computer Scientist
-        "1515",  # Operations Research Analyst
-        "0110",  # Economist
-        "2210",  # Information Technology Management
-        "1520",  # Mathematician Statistician
-        "1530",  # Statistician
-        "0800",  # Engineering
-        "0100",  # Social Science, Psychology, and Welfare
-        "1510",  # Actuary
-        "0150",  # Geography
-        "0343",  # Management and Program Analyst
-        "0601",  # General Health Science
-        "0400",  # Natural Resources Management and Biological Sciences
-        "1300",  # General Physical Science
-        "0130",  # Foreign Affairs
-        "1517",  # Digital Forensics Examiner
-        "1340",  # Meteorologist
-        "1516",  # Cryptanalyst
-        "1531",  # Statistician/Data Scientist
-        "0401",  # General Natural Resources Management and Biological Sciences
-        "1370",  # Cartographer
-        "1372",  # Geodesist
-        "1160",  # Financial Analysis
-        "8960",  # Production Control
-        "0500",  # Accounting and Budget
-        "0340",  # Program Management
-        "1306",  # Health Physicist
-        "0685",  # Public Health Program Specialist
-        "0187",  # Social Insurance Administrator
-        "1330",  # Physical Scientist
-        "1320",  # Chemist
-        "1313",  # Geophysics
-        "0560",  # Budget Analysis
-        "0200",  # Human Resources Management
-        "0391",  # Telecommunications
-        "1035",  # Public Affairs
-        "0690",  # Industrial Hygiene
-        "0890",  # Agricultural Commodity Grading
-        "1410",  # Librarian
-        "1701",  # General Education and Training
-        "0801",  # General Engineering
-        "2010",  # Inventory Management
-        "0809",  # Construction Control
-        "1321",  # Metallurgist
-        "1371",  # Cartographic Technician
-        "0101",  # Social Science
-        "0180",  # Psychology
-        "0201",  # Human Resources Management
-        "0341",  # Administrative Officer
-        "0454",  # Soil Conservation
-        "0696",  # Consumer Safety
-        "0804",  # Fire Protection Engineering
-        "0828",  # Equipment Services
-        "0850",  # Electrical Engineering
-        "0854",  # Computer Engineering
-        "1301",  # General Physical Scientist
-        "1308",  # Environmental Health
-        "0501",  # Financial Administration and Program
-        "0570",  # Financial Institutions Examining
-        "0106",  # Insurance Accounts
-        "0814",  # Mine Safety and Health
-        "0193",  # Social Services
+        "1560", # Data Scientist
     ]
     list_of_occupations = [add_leading_zero(
         i) for i in list_of_raw_occupations]
@@ -222,7 +159,7 @@ def gpt_calls(sample: pd.DataFrame) -> pd.DataFrame:
 
         # Process first prompt
         # Example of calling the function
-        response = process_prompt(f"Please label this job posting with the top 5 occupations that match it: {row['info']}", engine, temperature, "get_top_5_occupations")
+        response = process_prompt(f"Please label this job posting with UP TO 5 occupational names that match it - not topic areas, but job names: {row['info']}", engine, temperature, "get_top_5_occupations")
         results_prompt_1.append(response)
 
     sample['occupation'] = results_prompt_1
@@ -302,7 +239,7 @@ def main():
     # Filter the DataFrame to include only rows where the 'info' column
     # contains the word "data"
     jobs_with_data = filtered_data_occ.loc[filtered_data_occ['info'].str.lower(
-    ).str.count("data") >= 2].head(5)
+    ).str.count("data") >= 2].sample(n=20, random_state=1)
     # Process the  DataFrame using the GPT engine and return the final
     # DataFrame with additional columns
     data_frame = gpt_calls(jobs_with_data)
