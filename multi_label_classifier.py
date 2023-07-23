@@ -40,8 +40,6 @@ def gen_list_of_occupations() -> List[str]:
     """
 
     list_of_raw_occupations = [
-        "1529",  # Mathematician
-        "1550",  # Computer Scientist
         "1560", # Data Scientist
     ]
     list_of_occupations = [add_leading_zero(
@@ -237,12 +235,9 @@ def main():
     # occupation codes
     filtered_data_occ = current_data[current_data['JobCategory'].apply(filter_func, list_of_occupations=list_of_occupations)]
     # Filter the DataFrame to include only rows where the 'info' column
-    # contains the word "data"
-    jobs_with_data = filtered_data_occ.loc[filtered_data_occ['info'].str.lower(
-    ).str.count("data") >= 2].sample(n=20, random_state=1)
     # Process the  DataFrame using the GPT engine and return the final
     # DataFrame with additional columns
-    data_frame = gpt_calls(jobs_with_data)
+    data_frame = gpt_calls(filtered_data_occ)
     data_frame.to_pickle("../data/all_cols_sample.pkl")
     # Define the columns to be kept and written out
     return(data_frame)
