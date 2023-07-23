@@ -8,6 +8,7 @@ Created on Sat Jul 22 19:16:46 2023
 import pickle
 from typing import Any, List
 import pandas as pd
+import matplotlib.pyplot as plt
 
 def read_data_from_file(file_path: str) -> Any:
     """
@@ -48,31 +49,53 @@ def get_results(df):
 
     # Calculate average number of top N occupations in each row
     # Calculate average number of top N occupations in each row
+    # Calculating the average number of top N occupations in each row
     averages = []
     max_occupations = len(occupation_counts)
+
     for N in range(1, max_occupations + 1):
         top_N = occupation_counts.index[:N].tolist()
-    
+
         # Rows containing at least one of the top N occupations
         rows_with_top_N = df['occupation'].apply(lambda x: any(occ in top_N for occ in x))
         relevant_rows = df[rows_with_top_N]
-    
+
         # Average number of top N occupations in those rows
         counts_per_row = relevant_rows['occupation'].apply(lambda x: sum(1 for occ in x if occ in top_N))
         avg = counts_per_row.sum() / len(relevant_rows)
         averages.append(avg)
 
     result_df = pd.DataFrame({
-        'Count': occupation_counts.values,
-        'Cumulative Rows': cumulative_counts,
-        'Average Occupations per Listing': averages
-    }, index=occupation_counts.index)
-    
-    result_df['Adjusted Average'] = result_df['Average Occupations per Listing'] * result_df['Cumulative Rows'] / len(df)
+       'Count': occupation_counts.values,
+       'Cumulative Rows': cumulative_counts,
+       'Average Occupations per Listing': averages
+   }, index=occupation_counts.index)
+   
+    result_df['Adjusted Average'] = result_df['Average Occupations per Listing']
+
 
 
     return result_df
 
+
+
+
+def plot_scatter(dataframe):
+    """Generate scatter plot of Adjusted Average vs. Cumulative Rows."""
+    plt.figure(figsize=(10, 6))
+    plt.scatter(dataframe.index, dataframe['Adjusted Average'], color='blue', marker='o')
+    plt.title('Adjusted Average vs. Number of Occupations')
+    plt.xlabel('Number of Occupation')
+    plt.ylabel('Adjusted Average')
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+
+
+
 df = read_data_from_file("../data/all_cols_sample.pkl")
 result = get_results(df)
 print(result)
+# Sample code to call the plotting function:
+plot_scatter(result)
