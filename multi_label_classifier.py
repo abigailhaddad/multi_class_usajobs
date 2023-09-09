@@ -130,4 +130,4 @@ def main(n: int = None, num_repeats: int = 5) -> pd.DataFrame:
     
     return current_data
 
-df = main(n=50, num_repeats=3)  # Example: sampling 50 rows from the dataset and making 3 repeated calls for each
+df = main(num_repeats=1) 

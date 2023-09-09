@@ -3,6 +3,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
 
 def prepare_data(df):
     """Convert job titles to lowercase and create a concatenated column."""
@@ -49,14 +50,35 @@ def create_summary(df, y_kmeans, X, vectorizer):
     summary_df = summary_df.transpose()
     return summary_df
 
+# ... [rest of the imports]
+import seaborn as sns
+
+def get_top_n_titles(summary_df, n=5):
+    """Get the top n job titles by percentage for each cluster."""
+    top_titles = {}
+    for column in summary_df.columns:
+        top_titles[column] = summary_df[column].nlargest(n)
+    return pd.DataFrame(top_titles)
+
+def plot_heatmap(summary_df):
+    """Plot a heatmap showing distribution of job titles across clusters."""
+    plt.figure(figsize=(10, 15))
+    sns.heatmap(summary_df, cmap='viridis', linewidths=0.5)
+    plt.title('Distribution of Job Titles across Clusters')
+    plt.show()
+
 def main():
     df = pd.read_pickle("../data/all_cols_sample.pkl")
     df = prepare_data(df)
     X, vectorizer = get_tfidf_representation(df)
     optimal_clusters = find_optimal_clusters(X)
+    print(optimal_clusters)
     y_kmeans = perform_clustering(X, optimal_clusters)
     summary_df = create_summary(df, y_kmeans, X, vectorizer)
+    top_titles_df = get_top_n_titles(summary_df)
+    print("\nTop titles for each cluster:\n", top_titles_df)
     return(summary_df)
+
 
 # Call the main function
 if __name__ == '__main__':
