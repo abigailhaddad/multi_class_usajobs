@@ -83,7 +83,7 @@ def gpt_calls(sample: pd.DataFrame) -> pd.DataFrame:
     # Iterate through the dataframe and process each prompt
     for _, row in sample.iterrows():
         # Process first prompt
-        response = process_prompt(f"Please label this job posting with UP TO 3 occupational names that match it - not topic areas, but job names: {row['duties_var']}", engine, temperature, "get_top_5_occupations")
+        response = process_prompt(f"Please label this job posting with UP TO 3 occupational names that match it - not topic areas, but job names: {row['duties_var']}", engine, temperature, "get_up_to_3_occupations")
         results_prompt_1.append(response)
 
     sample['occupation'] = results_prompt_1
@@ -126,6 +126,7 @@ def do_multi_labels(n: int = None, num_repeats: int = 1) -> pd.DataFrame:
         data_frame = gpt_calls(current_data)
         current_data[f'occupation_{i+1}'] = data_frame['occupation']
     
+    current_data=current_data.drop(columns=['occupation'])
     current_data.to_pickle("../data/all_cols_sample.pkl")
     
     return current_data
