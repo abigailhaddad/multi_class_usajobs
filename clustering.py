@@ -33,7 +33,7 @@ def perform_clustering(data, optimal_clusters):
     """Perform KMeans clustering and return cluster labels."""
     kmeans = KMeans(n_clusters=optimal_clusters, init='k-means++', max_iter=300, n_init=10, random_state=0)
     y_kmeans = kmeans.fit_predict(data)
-    return y_kmeans
+    return kmeans, y_kmeans
 
 def create_summary(df, y_kmeans, X, vectorizer):
     """Create a summary dataframe showing the percentage presence of each job title in each cluster."""
@@ -50,22 +50,17 @@ def create_summary(df, y_kmeans, X, vectorizer):
     summary_df = summary_df.transpose()
     return summary_df
 
-# ... [rest of the imports]
-import seaborn as sns
 
 def get_top_n_titles(summary_df, n=5):
     """Get the top n job titles by percentage for each cluster."""
-    top_titles = {}
-    for column in summary_df.columns:
-        top_titles[column] = summary_df[column].nlargest(n)
-    return pd.DataFrame(top_titles)
+    dict_clusters={}
+    for row_number in range(0, len(summary_df)):
+        row=  summary_df.iloc[row_number]
+        dict_values=row.sort_values(ascending=False).head(n).to_dict()
+        dict_clusters[row_number]=dict_values
+    return dict_clusters
+        
 
-def plot_heatmap(summary_df):
-    """Plot a heatmap showing distribution of job titles across clusters."""
-    plt.figure(figsize=(10, 15))
-    sns.heatmap(summary_df, cmap='viridis', linewidths=0.5)
-    plt.title('Distribution of Job Titles across Clusters')
-    plt.show()
 
 def main():
     df = pd.read_pickle("../data/all_cols_sample.pkl")
@@ -73,13 +68,21 @@ def main():
     X, vectorizer = get_tfidf_representation(df)
     optimal_clusters = find_optimal_clusters(X)
     print(optimal_clusters)
-    y_kmeans = perform_clustering(X, optimal_clusters)
-    summary_df = create_summary(df, y_kmeans, X, vectorizer)
-    top_titles_df = get_top_n_titles(summary_df)
-    print("\nTop titles for each cluster:\n", top_titles_df)
-    return(summary_df)
+    kmeans, y_kmeans = perform_clustering(X, optimal_clusters)
+    
+    # Add cluster labels to the df dataframe
+    df['cluster'] = y_kmeans
 
+    summary_df = create_summary(df, y_kmeans, X, vectorizer)
+    top_titles_dict = get_top_n_titles(summary_df, n=10)
+    print(top_titles_dict)
+    
+    # If you want to see which job postings belong to, let's say, cluster 0:
+    cluster_0_jobs = df[df['cluster'] == 0]
+    print(cluster_0_jobs)
+    
+    return df, summary_df
 
 # Call the main function
 if __name__ == '__main__':
-    summary_df=main()
+    df, summary_df = main()
