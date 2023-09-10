@@ -37,7 +37,7 @@ def process_prompt(prompt: str, engine: str, temperature: float, function_name: 
                 messages=messages,
                 functions=[{
                     "name": function_name,
-                    "description": "Get top 5 occupations for the job posting",
+                    "description": "Get no more than 3 occupations for the job posting",
                     "parameters": OccupationResponse.schema()
                 }],
                 function_call={"name": function_name},
@@ -83,7 +83,7 @@ def gpt_calls(sample: pd.DataFrame) -> pd.DataFrame:
     # Iterate through the dataframe and process each prompt
     for _, row in sample.iterrows():
         # Process first prompt
-        response = process_prompt(f"Please label this job posting with UP TO 5 occupational names that match it - not topic areas, but job names: {row['duties_var']}", engine, temperature, "get_top_5_occupations")
+        response = process_prompt(f"Please label this job posting with UP TO 3 occupational names that match it - not topic areas, but job names: {row['duties_var']}", engine, temperature, "get_top_5_occupations")
         results_prompt_1.append(response)
 
     sample['occupation'] = results_prompt_1
@@ -104,7 +104,7 @@ def read_data_from_file(file_path: str) -> Any:
         data = pickle.load(file)
     return data
 
-def main(n: int = None, num_repeats: int = 5) -> pd.DataFrame:
+def do_multi_labels(n: int = None, num_repeats: int = 1) -> pd.DataFrame:
     """
     Main function to read the data, sample it, and process it using GPT engine with repeated calls.
 
@@ -130,4 +130,4 @@ def main(n: int = None, num_repeats: int = 5) -> pd.DataFrame:
     
     return current_data
 
-df = main(num_repeats=1) 
+

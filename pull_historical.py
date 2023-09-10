@@ -14,6 +14,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 import json
 import re
+import numpy as np
 
 def historical_search(position_series: str, start_date: str, end_date: str, page_size: int = 1000) -> pd.DataFrame:
     base_url = f"https://data.usajobs.gov/api/historicjoa?PositionSeries={position_series}&StartPositionOpenDate={start_date}&EndPositionOpenDate={end_date}"
@@ -95,7 +96,7 @@ def clean_html(value):
 
 
 
-def main(position_series: str, start_date: str, end_date: str) -> pd.DataFrame:
+def fetch_historical(position_series: str, start_date: str, end_date: str) -> pd.DataFrame:
     """
     Run a historical jobs search for the given parameters and return the data as a DataFrame.
 
@@ -155,12 +156,12 @@ def filter_duties(df: pd.DataFrame) -> pd.DataFrame:
 
 
 
-if __name__ == "__main__":
+def fetch_and_write_out_historical():
     # An example of fetching historical data for a given series and date range.
     position_series = "1560"
     start_date = "10-01-2021"
     end_date = "09-30-2023"
-    historical_data_from_function = main(position_series, start_date, end_date)   
+    historical_data_from_function = fetch_historical(position_series, start_date, end_date)   
     historical_data_from_function['announcement_text'] = historical_data_from_function['_links'].apply(fetch_text_from_link)
     expanded_data = historical_data_from_function.apply(expand_json, axis=1)
     result_df = pd.concat([historical_data_from_function, expanded_data], axis=1)
