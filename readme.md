@@ -1,4 +1,4 @@
-# Historical Job Listing Analysis for Occupational Code 1560 (Data Scientist)
+# Historical Job Listing Analysis for Occupational Code 1560 (Data Scientist) [ this is very much a draft - please get in touch if you're interested in this and actually want to use it for something ]
 
 This repository is focused on analyzing historical job listings specifically for the occupational code 1560 (Data Scientist) from USAJobs using the historical jobs API. The scripts fetch, classify, cluster, and visually represent these listings, offering insights into job title frequencies and their related groupings.
 
