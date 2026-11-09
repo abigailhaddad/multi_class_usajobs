@@ -18,8 +18,10 @@ def find_optimal_clusters(data, max_k=10):
     for k in iters:
         sse.append(KMeans(n_clusters=k, random_state=42).fit(data).inertia_)
         
-    differences = np.diff(sse)
-    optimal_clusters = np.where(differences > np.roll(differences, shift=-1))[0][0] + 2
+    # Elbow = where the SSE curve bends most (largest second difference). The grid is every
+    # 2nd k, so map the index back through `iters` rather than adding 2.
+    second_differences = np.diff(np.diff(sse))
+    optimal_clusters = list(iters)[int(np.argmax(second_differences)) + 1]
 
     return optimal_clusters
 
